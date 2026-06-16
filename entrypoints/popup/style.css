@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+/* ──────────────────────────────────────────────────────────────
+   Zene design tokens (subset, ported from PEEX src/styles/globals.css)
+   Flat / square language: 0 radius on boxes, warm-cream surfaces,
+   indigo brand, mono numerals.
+   ────────────────────────────────────────────────────────────── */
+:root {
+  /* Surface */
+  --bg-app: #ffffff;
+  --bg-sidebar: #f5f3ee;
+  --bg-subtle: #faf9f7;
+  --bg-raised: #ffffff;
+  --bg-accent-warm: #faf4e6;
+  --bg-hover: rgba(0, 0, 0, 0.04);
+
+  /* Ink */
+  --ink-0: #0a0a0b;
+  --ink-1: #1a1a1c;
+  --ink-2: #3a3a3f;
+  --ink-3: #6b6b73;
+  --ink-4: #9a9aa3;
+  --ink-5: #c4c4cc;
+
+  /* Strokes */
+  --line: rgba(15, 15, 20, 0.08);
+  --line-strong: rgba(15, 15, 20, 0.14);
+
+  /* Brand — indigo */
+  --brand: #6366f1;
+  --brand-ink: #4f46e5;
+  --brand-soft: #eef0ff;
+
+  /* Status */
+  --ok: #10b981;
+  --ok-soft: #e7f8f1;
+  --ok-ink: #047857;
+  --watch: #f59e0b;
+  --watch-soft: #fef3d7;
+  --watch-ink: #b45309;
+  --bad: #ef4444;
+  --bad-soft: #fdecec;
+  --bad-ink: #b91c1c;
+  --info: #3b82f6;
+  --info-soft: #e7f0fe;
+  --info-ink: #1d4ed8;
+
+  /* Engine accents */
+  --eng-chatgpt: #10a37f;
+  --eng-claude: #c96442;
+  --eng-gemini: #4285f4;
+  --eng-perplexity: #20808d;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+}
+
+/* Map tokens onto Tailwind v4 utilities (bg-app, text-ink-0, border-line, …). */
+@theme inline {
+  --color-app: var(--bg-app);
+  --color-sidebar: var(--bg-sidebar);
+  --color-subtle: var(--bg-subtle);
+  --color-raised: var(--bg-raised);
+  --color-accent-warm: var(--bg-accent-warm);
+
+  --color-ink-0: var(--ink-0);
+  --color-ink-1: var(--ink-1);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-ink-4: var(--ink-4);
+  --color-ink-5: var(--ink-5);
+
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-soft: var(--brand-soft);
+
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-ok-ink: var(--ok-ink);
+  --color-watch: var(--watch);
+  --color-watch-soft: var(--watch-soft);
+  --color-watch-ink: var(--watch-ink);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --color-bad-ink: var(--bad-ink);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-info-ink: var(--info-ink);
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
+html,
+body {
+  margin: 0;
+}
+
+body {
+  width: 384px;
+  font-family: var(--font-sans);
+  background: var(--bg-app);
+  color: var(--ink-1);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Signature mono-caps eyebrow label (from Zene). */
+.eyebrow {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-4);
+}
+
+/* Big tabular numeral. */
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
