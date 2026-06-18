@@ -1,12 +1,13 @@
-import type { Tone } from "@/lib/scoring";
+import type { Tone } from "@/lib/tone";
 
 const TONE_STROKE: Record<Tone, string> = {
   ok: "var(--ok)",
   watch: "var(--watch)",
   bad: "var(--bad)",
+  muted: "var(--ink-4)",
 };
 
-// SVG circular gauge for the readiness score.
+// SVG circular gauge for the overall readiness score.
 export function ScoreRing({
   score,
   tone,

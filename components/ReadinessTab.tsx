@@ -1,29 +1,25 @@
 import { useState } from "react";
-import type { SiteCheck } from "@/lib/types";
-import type { ScoreResult } from "@/lib/scoring";
-import { fixesFrom, rankChecks } from "@/lib/scoring";
-import { fixLine } from "@/lib/copy";
+import type { CheckStatus, ReadinessOk } from "@/lib/readiness-types";
+import { BAND_LABEL } from "@/lib/readiness-types";
+import { bandTone } from "@/lib/tone";
 import { CheckRow } from "./CheckRow";
 import { ScoreRing } from "./ScoreRing";
+import { Dimensions } from "./Dimensions";
+import { Engines } from "./Engines";
 import { Pill } from "./ui";
 import { LINKS, openTab } from "@/lib/constants";
 import { downloadDataUrl, renderScoreCard, tweetIntent } from "@/lib/share-card";
 
-export function ReadinessTab({
-  domain,
-  checks,
-  score,
-}: {
-  domain: string;
-  checks: SiteCheck[];
-  score: ScoreResult;
-}) {
-  const fixes = fixesFrom(checks);
-  const ordered = rankChecks(checks);
+const STATUS_RANK: Record<CheckStatus, number> = { fail: 0, warn: 1, pass: 2 };
+
+export function ReadinessTab({ domain, result }: { domain: string; result: ReadinessOk }) {
+  const tone = bandTone(result.band);
+  const band = BAND_LABEL[result.band];
+  const checks = [...result.checks].sort((a, b) => STATUS_RANK[a.status] - STATUS_RANK[b.status]);
   const [copied, setCopied] = useState(false);
 
   function downloadCard() {
-    const url = renderScoreCard({ domain, score: score.score, grade: score.grade, tone: score.tone });
+    const url = renderScoreCard({ domain, score: result.score, grade: band, tone });
     downloadDataUrl(url, `zene-${domain}-ai-readiness.png`);
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
@@ -33,41 +29,27 @@ export function ReadinessTab({
     <div className="flex flex-col">
       {/* Score header */}
       <div className="flex items-center gap-4 px-4 py-4">
-        <ScoreRing score={score.score} tone={score.tone} grade={score.grade} />
+        <ScoreRing score={result.score} tone={tone} grade={band} />
         <div className="min-w-0 flex-1">
           <div className="eyebrow">AI Readiness · {domain}</div>
           <p className="mt-1 text-[13px] leading-snug text-ink-2">
-            {score.tone === "ok"
+            {tone === "ok"
               ? "Strong foundation — AI engines can read this site."
-              : score.tone === "bad"
-                ? "AI engines may struggle to read this site. Fix the items below."
+              : tone === "bad"
+                ? "AI engines may struggle to read this site. Fix the flags below."
                 : "Some gaps could keep AI engines from fully reading this site."}
           </p>
-          <p className="mt-1 text-[11px] text-ink-4">
-            {score.measured}/{score.total} checks measured
-          </p>
+          <p className="mt-1 text-[11px] text-ink-4">{result.checks.length} signals checked</p>
         </div>
       </div>
 
-      {/* Fixes */}
-      {fixes.length > 0 && (
-        <div className="border-t border-line bg-accent-warm/60 px-4 py-3">
-          <div className="eyebrow mb-2">Top fixes</div>
-          <ul className="flex flex-col gap-1.5">
-            {fixes.slice(0, 3).map((c) => (
-              <li key={c.key} className="flex items-start gap-2 text-[12px] leading-snug text-ink-2">
-                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
-                {fixLine(c)}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <Dimensions dimensions={result.dimensions} />
+      {result.engines && result.engines.length > 0 && <Engines engines={result.engines} />}
 
-      {/* All checks */}
+      {/* All checks, worst first */}
       <ul className="border-t border-line">
-        {ordered.map((c) => (
-          <CheckRow key={c.key} check={c} />
+        {checks.map((c) => (
+          <CheckRow key={c.id} check={c} />
         ))}
       </ul>
 
@@ -80,24 +62,24 @@ export function ReadinessTab({
           {copied ? "Saved ✓" : "Download score card"}
         </button>
         <button
-          onClick={() => openTab(tweetIntent(domain, score.score, LINKS.freeChecker("share_x")))}
+          onClick={() => openTab(tweetIntent(domain, result.score, LINKS.checker(domain, "share_x")))}
           className="border border-line-strong px-3 py-2 text-[12px] font-semibold text-ink-1 transition hover:bg-subtle"
         >
           Share
         </button>
       </div>
 
-      {/* Conversion CTA — snapshot here, the film lives in Zene */}
+      {/* Conversion CTA — full report + tracking lives on Zene */}
       <button
-        onClick={() => openTab(LINKS.freeChecker("readiness_cta"))}
+        onClick={() => openTab(LINKS.checker(domain, "readiness_cta"))}
         className="flex items-center justify-between gap-2 border-t border-line bg-brand-soft px-4 py-3 text-left transition hover:brightness-95"
       >
         <span>
           <span className="block text-[13px] font-semibold text-brand-ink">
-            Track this score over time →
+            Full report & track over time →
           </span>
           <span className="block text-[11px] text-ink-3">
-            Daily monitoring, all 4 engines & competitors on Zene
+            Per-engine fixes, history & competitors on Zene
           </span>
         </span>
         <Pill tone="ok">Free</Pill>

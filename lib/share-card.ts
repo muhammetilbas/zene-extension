@@ -1,4 +1,4 @@
-import type { Tone } from "./scoring";
+import type { Tone } from "./tone";
 import { SITE_URL } from "./constants";
 
 // Shareable score card — the viral loop. Renders an OG-sized (1200×630) PNG
@@ -10,6 +10,7 @@ const TONE_COLOR: Record<Tone, string> = {
   ok: "#10b981",
   watch: "#f59e0b",
   bad: "#ef4444",
+  muted: "#9a9aa3",
 };
 
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {

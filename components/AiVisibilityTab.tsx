@@ -53,7 +53,7 @@ export function AiVisibilityTab({ domain }: { domain: string }) {
       </ul>
 
       <button
-        onClick={() => openTab(LINKS.freeChecker("visibility_cta"))}
+        onClick={() => openTab(LINKS.checker(domain, "visibility_cta"))}
         className="mt-4 w-full bg-brand px-3 py-2.5 text-[13px] font-semibold text-white transition hover:brightness-110"
       >
         Run a free AI mention check →

@@ -1,9 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { browser } from "wxt/browser";
-import type { RawProbe, SiteCheck } from "@/lib/types";
-import { analyzeProbe } from "@/lib/site-health";
-import { scoreFromChecks, type ScoreResult } from "@/lib/scoring";
-import { probeInPage } from "@/lib/collector";
+import type { ReadinessOk } from "@/lib/readiness-types";
+import { fetchReadiness } from "@/lib/api";
 import { ReadinessTab } from "./ReadinessTab";
 import { AiVisibilityTab } from "./AiVisibilityTab";
 import { LINKS, openTab } from "@/lib/constants";
@@ -11,31 +9,31 @@ import { LINKS, openTab } from "@/lib/constants";
 type Scan =
   | { kind: "loading" }
   | { kind: "unsupported" }
-  | { kind: "error" }
-  | { kind: "done"; domain: string; checks: SiteCheck[]; score: ScoreResult };
+  | { kind: "rate_limited"; retryAfter: number; domain: string }
+  | { kind: "error"; message: string; domain: string }
+  | { kind: "done"; result: ReadinessOk; domain: string };
 
 type TabKey = "readiness" | "visibility";
 
+function hostOf(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return "";
+  }
+}
+
 async function runScan(): Promise<Scan> {
   const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
-  if (!tab?.id || !tab.url || !/^https?:\/\//i.test(tab.url)) {
+  if (!tab?.url || !/^https?:\/\//i.test(tab.url)) {
     return { kind: "unsupported" };
   }
-  try {
-    const results = await browser.scripting.executeScript({
-      target: { tabId: tab.id },
-      func: probeInPage,
-    });
-    const raw = results[0]?.result as RawProbe | undefined;
-    if (!raw) return { kind: "error" };
-    const checks = analyzeProbe(raw);
-    const score = scoreFromChecks(checks);
-    const domain = new URL(raw.origin).hostname.replace(/^www\./, "");
-    return { kind: "done", domain, checks, score };
-  } catch {
-    // Restricted pages (chrome://, the Web Store, PDF viewer) reject injection.
-    return { kind: "unsupported" };
-  }
+  const domain = hostOf(tab.url);
+  const outcome = await fetchReadiness(tab.url);
+  if (outcome.kind === "ok") return { kind: "done", result: outcome.result, domain };
+  if (outcome.kind === "rate_limited")
+    return { kind: "rate_limited", retryAfter: outcome.retryAfter, domain };
+  return { kind: "error", message: outcome.message, domain };
 }
 
 export function App() {
@@ -46,7 +44,12 @@ export function App() {
     runScan().then(setScan);
   }, []);
 
-  const domain = scan.kind === "done" ? scan.domain : "";
+  const domain = scan.kind === "loading" || scan.kind === "unsupported" ? "" : scan.domain;
+
+  function retry() {
+    setScan({ kind: "loading" });
+    runScan().then(setScan);
+  }
 
   return (
     <div className="bg-app text-ink-1">
@@ -62,7 +65,7 @@ export function App() {
       </nav>
 
       {tab === "readiness" ? (
-        <ReadinessBody scan={scan} onRetry={() => { setScan({ kind: "loading" }); runScan().then(setScan); }} />
+        <ReadinessBody scan={scan} onRetry={retry} />
       ) : (
         <AiVisibilityTab domain={domain} />
       )}
@@ -73,23 +76,42 @@ export function App() {
 }
 
 function ReadinessBody({ scan, onRetry }: { scan: Scan; onRetry: () => void }) {
-  if (scan.kind === "loading") return <Centered>Scanning this site…</Centered>;
+  if (scan.kind === "loading") return <Centered>Checking this site…</Centered>;
+
   if (scan.kind === "unsupported")
+    return <Centered>Open any website (http/https) and click the Zene icon to check it.</Centered>;
+
+  if (scan.kind === "rate_limited")
     return (
       <Centered>
-        Open any website (http/https) and click the Zene icon to scan it.
-      </Centered>
-    );
-  if (scan.kind === "error")
-    return (
-      <Centered>
-        Couldn’t scan this page.
+        Too many checks — try again in {scan.retryAfter}s.
         <button onClick={onRetry} className="mt-2 text-brand-ink underline">
-          Try again
+          Retry
         </button>
       </Centered>
     );
-  return <ReadinessTab domain={scan.domain} checks={scan.checks} score={scan.score} />;
+
+  if (scan.kind === "error")
+    return (
+      <Centered>
+        {scan.message}
+        <div className="mt-3 flex flex-col items-center gap-2">
+          <button onClick={onRetry} className="text-brand-ink underline">
+            Try again
+          </button>
+          {scan.domain && (
+            <button
+              onClick={() => openTab(LINKS.checker(scan.domain, "error_fallback"))}
+              className="text-[12px] text-ink-4 underline"
+            >
+              Open the full checker on Zene
+            </button>
+          )}
+        </div>
+      </Centered>
+    );
+
+  return <ReadinessTab domain={scan.domain} result={scan.result} />;
 }
 
 function Header() {
