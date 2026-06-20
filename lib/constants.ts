@@ -29,6 +29,14 @@ export const LINKS = {
 };
 
 export function openTab(url: string): void {
+  // Only ever open http(s). Defends against a non-web scheme (javascript:, data:)
+  // sneaking in via an API-provided fixHref or a malformed link.
+  try {
+    const { protocol } = new URL(url);
+    if (protocol !== "https:" && protocol !== "http:") return;
+  } catch {
+    return;
+  }
   if (browser?.tabs?.create) {
     browser.tabs.create({ url });
   } else {

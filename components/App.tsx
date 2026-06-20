@@ -4,6 +4,7 @@ import type { ReadinessOk } from "@/lib/readiness-types";
 import { fetchReadiness } from "@/lib/api";
 import { ReadinessTab } from "./ReadinessTab";
 import { AiVisibilityTab } from "./AiVisibilityTab";
+import { ZeneMark } from "./ZeneMark";
 import { LINKS, openTab } from "@/lib/constants";
 
 type Scan =
@@ -28,8 +29,17 @@ async function runScan(): Promise<Scan> {
   if (!tab?.url || !/^https?:\/\//i.test(tab.url)) {
     return { kind: "unsupported" };
   }
-  const domain = hostOf(tab.url);
-  const outcome = await fetchReadiness(tab.url);
+  // Send only the ORIGIN, never the full URL — the API scores the site at
+  // origin level, so the path/query (which can carry tokens or private data)
+  // never leaves the browser.
+  let origin: string;
+  try {
+    origin = new URL(tab.url).origin;
+  } catch {
+    return { kind: "unsupported" };
+  }
+  const domain = hostOf(origin);
+  const outcome = await fetchReadiness(origin);
   if (outcome.kind === "ok") return { kind: "done", result: outcome.result, domain };
   if (outcome.kind === "rate_limited")
     return { kind: "rate_limited", retryAfter: outcome.retryAfter, domain };
@@ -117,9 +127,7 @@ function ReadinessBody({ scan, onRetry }: { scan: Scan; onRetry: () => void }) {
 function Header() {
   return (
     <header className="flex items-center gap-2 border-b border-line px-4 py-3">
-      <span className="grid h-6 w-6 place-items-center bg-brand text-[14px] font-extrabold text-white">
-        Z
-      </span>
+      <ZeneMark size={22} />
       <span className="text-[14px] font-bold tracking-tight text-ink-0">Zene</span>
       <span className="eyebrow ml-auto">AI Visibility Checker</span>
     </header>

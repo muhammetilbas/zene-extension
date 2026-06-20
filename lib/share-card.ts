@@ -1,5 +1,6 @@
 import type { Tone } from "./tone";
 import { SITE_URL } from "./constants";
+import { ZENE_INK, ZENE_TILE_FROM, ZENE_TILE_TO, ZENE_Z_PATH } from "./brand";
 
 // Shareable score card — the viral loop. Renders an OG-sized (1200×630) PNG
 // entirely client-side so people can drop it on X / LinkedIn. Every card says
@@ -81,13 +82,23 @@ export function renderScoreCard(opts: {
   ctx.fillStyle = "#ffffff";
   ctx.fillText(grade, 124, 538);
 
-  // Indigo "Z" mark, top-right.
-  ctx.fillStyle = "#6366f1";
-  roundRect(ctx, W - 200, 96, 104, 104, 6);
+  // Zene mark, top-right — the real brand artwork (periwinkle gradient tile +
+  // indigo "z" glyph), matching the toolbar icon and popup header.
+  const tileX = W - 200;
+  const tileY = 96;
+  const tile = 104;
+  const tileGrad = ctx.createLinearGradient(tileX, tileY, tileX + tile, tileY + tile);
+  tileGrad.addColorStop(0, ZENE_TILE_FROM);
+  tileGrad.addColorStop(1, ZENE_TILE_TO);
+  ctx.fillStyle = tileGrad;
+  roundRect(ctx, tileX, tileY, tile, tile, 28);
   ctx.fill();
-  ctx.fillStyle = "#ffffff";
-  ctx.font = `800 70px ${sans}`;
-  ctx.fillText("Z", W - 168, 174);
+  ctx.save();
+  ctx.translate(tileX, tileY);
+  ctx.scale(tile / 48, tile / 48);
+  ctx.fillStyle = ZENE_INK;
+  ctx.fill(new Path2D(ZENE_Z_PATH));
+  ctx.restore();
 
   // Footer attribution — the mention that does the work.
   ctx.fillStyle = "#6b6b73";
