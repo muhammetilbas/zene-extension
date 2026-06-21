@@ -1,17 +1,10 @@
-import { ZENE_INK, ZENE_TILE_FROM, ZENE_TILE_TO, ZENE_Z_PATH } from "@/lib/brand";
+import { ZENE_BG, ZENE_CIRCLE, ZENE_INK, ZENE_VIEWBOX, ZENE_Z_PATH } from "@/lib/brand";
 
-// The Zene logo mark — periwinkle gradient tile + indigo "z", matching
-// tryzene.com / PEEX exactly (no font dependency; the "z" is an outlined glyph).
+// The Zene logo mark — black circle + white "z", matching tryzene.com.
 export function ZeneMark({ size = 24 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 48 48" role="img" aria-label="Zene">
-      <defs>
-        <linearGradient id="zene-tile" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor={ZENE_TILE_FROM} />
-          <stop offset="1" stopColor={ZENE_TILE_TO} />
-        </linearGradient>
-      </defs>
-      <rect width="48" height="48" rx="13" fill="url(#zene-tile)" />
+    <svg width={size} height={size} viewBox={`0 0 ${ZENE_VIEWBOX} ${ZENE_VIEWBOX}`} role="img" aria-label="Zene">
+      <circle cx={ZENE_CIRCLE.cx} cy={ZENE_CIRCLE.cy} r={ZENE_CIRCLE.r} fill={ZENE_BG} />
       <path d={ZENE_Z_PATH} fill={ZENE_INK} />
     </svg>
   );

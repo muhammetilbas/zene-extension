@@ -33,7 +33,7 @@ if (!chrome) {
 }
 
 for (const size of [16, 32, 48, 96, 128]) {
-  const svg = SVG.replace('width="48" height="48"', `width="${size}" height="${size}"`);
+  const svg = SVG.replace(/width="\d+" height="\d+"/, `width="${size}" height="${size}"`);
   const html = join(tmpdir(), `zene-icon-${size}.html`);
   writeFileSync(
     html,
