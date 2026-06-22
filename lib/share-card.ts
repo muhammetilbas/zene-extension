@@ -1,6 +1,6 @@
 import type { Tone } from "./tone";
 import { SITE_URL } from "./constants";
-import { ZENE_BG, ZENE_INK, ZENE_VIEWBOX, ZENE_Z_PATH } from "./brand";
+import { ZENE_GRAD_FROM, ZENE_GRAD_TO, ZENE_INK, ZENE_RADIUS, ZENE_VIEWBOX, ZENE_Z_PATH } from "./brand";
 
 // Shareable score card — the viral loop. Renders an OG-sized (1200×630) PNG
 // entirely client-side so people can drop it on X / LinkedIn. Every card says
@@ -82,14 +82,16 @@ export function renderScoreCard(opts: {
   ctx.fillStyle = "#ffffff";
   ctx.fillText(grade, 124, 538);
 
-  // Zene mark, top-right — black circle + white "z", matching the toolbar icon
-  // and popup header.
+  // Zene mark, top-right — rounded-square indigo gradient tile + white "z",
+  // matching the toolbar icon and popup header.
   const tileX = W - 200;
   const tileY = 96;
   const tile = 104;
-  ctx.fillStyle = ZENE_BG;
-  ctx.beginPath();
-  ctx.arc(tileX + tile / 2, tileY + tile / 2, tile / 2, 0, Math.PI * 2);
+  const tileGrad = ctx.createLinearGradient(tileX, tileY, tileX + tile, tileY + tile);
+  tileGrad.addColorStop(0, ZENE_GRAD_FROM);
+  tileGrad.addColorStop(1, ZENE_GRAD_TO);
+  ctx.fillStyle = tileGrad;
+  roundRect(ctx, tileX, tileY, tile, tile, (tile * ZENE_RADIUS) / ZENE_VIEWBOX);
   ctx.fill();
   ctx.save();
   ctx.translate(tileX, tileY);
