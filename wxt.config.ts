@@ -12,7 +12,7 @@ export default defineConfig({
   manifest: {
     name: "Zene — AI Visibility Checker",
     description:
-      "Free AI readiness score for any site: can ChatGPT, Claude, Gemini & Perplexity actually read your brand? Measured by Zene.",
+      "Free AI readiness score for any site: can ChatGPT, Claude, Gemini, Perplexity & Grok actually read your brand? Measured by Zene.",
     permissions: ["activeTab"],
     host_permissions: ["https://tryzene.com/*"],
     action: {
