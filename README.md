@@ -41,6 +41,23 @@ result you'd get on the web.
 For history, competitor comparisons and real mention scans, the "more" links
 open the full report on Zene.
 
+## About Zene ☁️
+
+This extension is the free, quick version of [**Zene**](https://tryzene.com) — a
+tool for making your brand show up when people ask ChatGPT, Claude, Gemini,
+Perplexity and Grok for recommendations (sometimes called GEO, generative engine
+optimization).
+
+The extension gives you a snapshot. Zene gives you the rest:
+
+- Track your AI readiness score over time, not just once
+- See whether the engines actually **mention** you when asked about your space
+- Compare yourself against competitors
+- Get concrete fixes and watch the score move
+
+If the score in the popup got your attention, run the full check at
+**[tryzene.com](https://tryzene.com)**.
+
 ## Privacy & permissions 🔐
 
 The extension keeps its footprint small on purpose, and you can verify every line
