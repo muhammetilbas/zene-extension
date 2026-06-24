@@ -6,7 +6,7 @@ import tailwindcss from "@tailwindcss/vite";
 //   • host_permissions: tryzene.com only → call the public readiness API from the
 //     popup. A single, own-domain host (not <all_urls>), so review stays easy.
 // The site itself is fetched & scored server-side by Zene, so the extension needs
-// no access to the sites it checks. For local PEEX dev add "http://localhost:3000/*".
+// no access to the sites it checks. For local Zene dev add "http://localhost:3000/*".
 export default defineConfig({
   modules: ["@wxt-dev/module-react"],
   manifest: {

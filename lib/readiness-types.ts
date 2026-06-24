@@ -1,4 +1,4 @@
-// Mirror of PEEX src/lib/tools/ai-readiness-types.ts — kept in lockstep so the
+// Mirror of the Zene API's ai-readiness types — kept in lockstep so the
 // extension renders exactly what /api/tools/ai-readiness returns. No runtime
 // logic beyond the pure helpers (safe, dependency-free). If the API's shape
 // changes, update this file to match.

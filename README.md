@@ -1,100 +1,106 @@
-# Zene — AI Visibility Checker (Chrome extension)
+# Zene — AI Visibility Checker 👻
 
-Free, zero-signup Chrome extension that scores any website's **AI readiness** —
-whether ChatGPT, Claude, Gemini, Perplexity & Grok can actually reach, read &
-cite the brand. The viral, top-of-funnel companion to
-[Zene](https://tryzene.com) (PEEX).
+A free Chrome extension that tells you whether AI engines can actually read your
+site. Open any page, click the icon, and get an instant AI Readiness score for
+ChatGPT, Claude, Gemini, Perplexity and Grok.
 
-## How it works (single source of truth)
+No signup, no account, nothing to install beyond the extension.
 
-The extension is a **thin client over Zene's public readiness API**
-(`/api/tools/ai-readiness`) — the **same endpoint the tryzene.com tool uses**. So
-the score in the popup is identical to the score on the web, byte for byte. No
-separate scoring logic to drift out of sync.
+[![License: MIT](https://img.shields.io/badge/license-MIT-10b981.svg)](./LICENSE)
+[![Built with WXT](https://img.shields.io/badge/built%20with-WXT-6366F1)](https://wxt.dev)
+&nbsp;·&nbsp; [tryzene.com](https://tryzene.com)
 
-1. You click the icon on any site → the popup reads the active tab's URL
-   (`activeTab`).
-2. It `POST`s that URL to `https://tryzene.com/api/tools/ai-readiness`.
-3. Zene fetches & scores the site server-side (deterministic, no LLM): 11 signals
-   across 3 dimensions (**Access / Understand / Cite**) + a per-engine readiness
-   verdict, each gap deep-linked to the tool that fixes it.
-4. The popup renders the result; every "more" path hands off to
-   `tryzene.com/tools/ai-visibility-checker?url=<domain>` (which auto-runs the
-   full report) and on to signup for tracking over time.
+## Why 🤔
 
-## The free / paid line
+People increasingly ask an AI assistant instead of scrolling a results page. If
+the engine can't crawl, parse or cite your site, it can't recommend you — and
+nothing tells you that's happening. This extension checks the signals that decide
+it, so you can see (and fix) the gaps.
 
-> **Extension = "what's the state right now" (a snapshot). Zene = "what's
-> happening over time, vs competitors, and what to do" (the film).**
+## What you get 📊
 
-| Free in the extension | Redirect to Zene |
+- An AI Readiness score from 0–100 with a letter grade
+- 11 signals grouped into three dimensions: **Access**, **Understand**, **Cite**
+- A readiness verdict per engine (ChatGPT, Claude, Gemini, Perplexity, Grok)
+- A score card you can download and share
+- Per-signal fixes that deep-link to the matching tool on Zene
+
+## How it works ⚙️
+
+The popup doesn't score anything itself. It calls Zene's public readiness API —
+the same endpoint the checker on tryzene.com uses — so you get the exact same
+result you'd get on the web.
+
+```
+1. you click the icon      → the popup reads the active tab's URL
+2. it POSTs the origin      → https://tryzene.com/api/tools/ai-readiness
+3. Zene scores it server-side (deterministic, no LLM)
+4. the popup renders the score, dimensions, per-engine verdict and fixes
+```
+
+For history, competitor comparisons and real mention scans, the "more" links
+open the full report on Zene.
+
+## Privacy & permissions 🔐
+
+The extension keeps its footprint small on purpose, and you can verify every line
+of that here.
+
+| Permission | What it's for |
 | --- | --- |
-| AI readiness score + band, instantly, no signup | Daily tracking of the score over time |
-| 3 dimensions + per-engine readiness | Real AI **mention** scans (does an engine name you?) |
-| Per-signal fixes (deep-linked to Zene tools) | Competitor comparison, history, alerts, PDF |
-| Shareable score card (viral loop) | — |
+| `activeTab` | Read the current tab's URL, only after you click the icon |
+| `host_permissions: https://tryzene.com/*` | Call the readiness API (a single domain, not `<all_urls>`) |
 
-## Permissions (minimal)
+It sends only the **origin** of the page you choose to check (e.g.
+`https://example.com`). It never sends the full path, never reads page content,
+never touches your browsing history, and saves nothing on your device. Full
+policy at <https://tryzene.com/privacy>.
 
-- `activeTab` — read the current tab's URL after you click the icon.
-- `host_permissions: ["https://tryzene.com/*"]` — call the readiness API from the
-  popup. A single, own-domain host (not `<all_urls>`), so Web Store review is easy.
+One trade-off: since Zene fetches sites server-side, it can't reach
+`localhost` or intranet pages. Those fall back to opening the full checker on the
+web.
 
-The extension needs **no access to the sites it checks** — Zene fetches them
-server-side. (Trade-off: it can't check `localhost`/intranet sites the server
-can't reach; those fall back to "Open the full checker on Zene".)
-
-## Layout
-
-```
-entrypoints/popup/   index.html · main.tsx · style.css (Zene tokens)
-components/          App · ReadinessTab · AiVisibilityTab · ScoreRing
-                     Dimensions · Engines · CheckRow · ui
-lib/                 api (readiness client) · readiness-types (mirrors PEEX
-                     ai-readiness-types.ts) · tone · constants · share-card
-scripts/             gen-icons.mjs (icon PNGs from icon-source.png) ·
-                     gen-screenshots.mjs (Web Store screenshots)
-```
-
-`lib/readiness-types.ts` mirrors `PEEX/src/lib/tools/ai-readiness-types.ts` —
-keep them in lockstep if the API's response shape changes.
-
-## Develop
+## Develop 🧑‍💻
 
 ```bash
 npm install
-npm run dev          # launches Chrome (for Testing) with the extension + HMR
-npm run compile      # tsc --noEmit
-npm run build        # production build → .output/chrome-mv3
-npm run zip          # packaged zip for the Web Store
+npm run dev        # launch a browser with the extension + hot reload
+npm run compile    # tsc --noEmit
+npm run build      # production build → .output/chrome-mv3
+npm run zip        # packaged zip for the Web Store
 ```
 
-- If no normal Chrome/Brave/Edge is installed, `web-ext.config.ts` auto-points the
-  dev launcher at a puppeteer "Chrome for Testing" build (or `$CHROME_PATH`). With
-  a real browser installed you can ignore or delete that file.
-- To develop against a **local PEEX**: run PEEX on `:3000`, set
-  `VITE_ZENE_BASE=http://localhost:3000`, and add `http://localhost:3000/*` to
-  `host_permissions` in `wxt.config.ts`.
-- Manual load: `chrome://extensions` → Developer mode → Load unpacked →
+A few notes:
+
+- If you don't have Chrome/Brave/Edge installed, `web-ext.config.ts` falls back to
+  a puppeteer "Chrome for Testing" build (or whatever `$CHROME_PATH` points to).
+- To run against a local backend, set `VITE_ZENE_BASE=http://localhost:3000` and
+  add `http://localhost:3000/*` to `host_permissions` in `wxt.config.ts`.
+- To load it by hand: `chrome://extensions` → Developer mode → Load unpacked →
   `.output/chrome-mv3`.
+- Assets are generated: `node scripts/gen-icons.mjs` for the icons and
+  `node scripts/gen-screenshots.mjs` for the store screenshots.
 
-## Privacy
+## Project layout 🗂️
 
-The extension sends **only the origin** (scheme + domain) of the page you
-explicitly choose to check to `https://tryzene.com/api/tools/ai-readiness`. It
-never reads page content, never tracks browsing, and stores nothing on your
-device. Full policy: <https://tryzene.com/privacy>.
+```
+entrypoints/popup/   index.html · main.tsx · style.css (design tokens)
+components/          App · ReadinessTab · AiVisibilityTab · ScoreRing ·
+                     Dimensions · Engines · CheckRow · ReadinessSkeleton · ui
+lib/                 api · readiness-types · tone · constants · share-card · brand
+scripts/             gen-icons.mjs · gen-screenshots.mjs · icon-source.png
+```
 
-## Roadmap
+`lib/readiness-types.ts` mirrors the API's response shape, so keep the two in sync
+if the API ever changes.
 
-- **Share/OG route** so downloaded score cards become indexable `tryzene.com/...`
-  URLs (more places LLMs can learn the brand).
-- **Competitor compare** in the popup: scan a rival's domain too, show both —
-  still one API call each, still free.
+## Roadmap 🗺️
 
-All outbound links carry `utm_source=extension` (see `lib/constants.ts`).
+- A share/OG route so downloaded score cards become indexable links
+- Competitor comparison inside the popup — scan a rival's domain side by side
 
-## License
+## License 📄
 
-[MIT](./LICENSE). The Zene name/logo and the AI engine logos are trademarks of
-their respective owners, used nominatively.
+[MIT](./LICENSE) © Muhammet İlbaş. The Zene name and logo, and the engine logos
+used to label each engine, belong to their respective owners and are used
+nominatively.

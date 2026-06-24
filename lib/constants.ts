@@ -3,8 +3,8 @@ import { browser } from "wxt/browser";
 // Single source of truth for the Zene origin + outbound links.
 //
 // API_BASE is where the public readiness API lives. To develop against a local
-// PEEX (`npm run dev` on :3000), set VITE_ZENE_BASE=http://localhost:3000 and add
-// that host to host_permissions in wxt.config.ts.
+// Zene backend (`npm run dev` on :3000), set VITE_ZENE_BASE=http://localhost:3000
+// and add that host to host_permissions in wxt.config.ts.
 export const SITE_URL = "https://tryzene.com";
 const ENV = import.meta.env as unknown as Record<string, string | undefined>;
 export const API_BASE = ENV.VITE_ZENE_BASE || SITE_URL;

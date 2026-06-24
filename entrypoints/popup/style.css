@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ──────────────────────────────────────────────────────────────
-   Zene design tokens (subset, ported from PEEX src/styles/globals.css)
+   Zene design tokens (subset, ported from the Zene app's globals.css)
    Flat / square language: 0 radius on boxes, warm-cream surfaces,
    indigo brand, mono numerals.
    ────────────────────────────────────────────────────────────── */
