@@ -4,3 +4,12 @@ node_modules
 .DS_Store
 stats.html
 *.zip
+
+# Secrets / local env
+.env
+.env.*
+
+# Local submission helpers & generated marketing assets (not part of the source)
+STORE_LISTING.md
+PRIVACY_POLICY.md
+store-assets/

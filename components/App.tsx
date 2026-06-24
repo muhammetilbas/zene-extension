@@ -3,8 +3,8 @@ import { browser } from "wxt/browser";
 import type { ReadinessOk } from "@/lib/readiness-types";
 import { fetchReadiness } from "@/lib/api";
 import { ReadinessTab } from "./ReadinessTab";
+import { ReadinessSkeleton } from "./ReadinessSkeleton";
 import { AiVisibilityTab } from "./AiVisibilityTab";
-import { ZeneMark } from "./ZeneMark";
 import { LINKS, openTab } from "@/lib/constants";
 
 type Scan =
@@ -86,7 +86,7 @@ export function App() {
 }
 
 function ReadinessBody({ scan, onRetry }: { scan: Scan; onRetry: () => void }) {
-  if (scan.kind === "loading") return <Centered>Checking this site…</Centered>;
+  if (scan.kind === "loading") return <ReadinessSkeleton />;
 
   if (scan.kind === "unsupported")
     return <Centered>Open any website (http/https) and click the Zene icon to check it.</Centered>;
@@ -127,8 +127,7 @@ function ReadinessBody({ scan, onRetry }: { scan: Scan; onRetry: () => void }) {
 function Header() {
   return (
     <header className="flex items-center gap-2 border-b border-line px-4 py-3">
-      <ZeneMark size={22} />
-      <span className="text-[14px] font-bold tracking-tight text-ink-0">Zene</span>
+      <span className="text-[15px] font-bold tracking-tight text-ink-0">Zene</span>
       <span className="eyebrow ml-auto">AI Visibility Checker</span>
     </header>
   );

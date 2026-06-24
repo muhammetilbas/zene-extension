@@ -52,7 +52,8 @@ components/          App · ReadinessTab · AiVisibilityTab · ScoreRing
                      Dimensions · Engines · CheckRow · ui
 lib/                 api (readiness client) · readiness-types (mirrors PEEX
                      ai-readiness-types.ts) · tone · constants · share-card
-scripts/             gen-icons.mjs (dependency-free PNG icon generator)
+scripts/             gen-icons.mjs (icon PNGs from icon-source.png) ·
+                     gen-screenshots.mjs (Web Store screenshots)
 ```
 
 `lib/readiness-types.ts` mirrors `PEEX/src/lib/tools/ai-readiness-types.ts` —
@@ -68,22 +69,32 @@ npm run build        # production build → .output/chrome-mv3
 npm run zip          # packaged zip for the Web Store
 ```
 
-- This machine has no normal Chrome installed, so `web-ext.config.ts` points the
-  dev launcher at the puppeteer "Chrome for Testing" build. Install Chrome/Brave/
-  Edge for real use, then set `CHROME_PATH` or delete that file.
+- If no normal Chrome/Brave/Edge is installed, `web-ext.config.ts` auto-points the
+  dev launcher at a puppeteer "Chrome for Testing" build (or `$CHROME_PATH`). With
+  a real browser installed you can ignore or delete that file.
 - To develop against a **local PEEX**: run PEEX on `:3000`, set
   `VITE_ZENE_BASE=http://localhost:3000`, and add `http://localhost:3000/*` to
   `host_permissions` in `wxt.config.ts`.
 - Manual load: `chrome://extensions` → Developer mode → Load unpacked →
   `.output/chrome-mv3`.
 
-## Next steps
+## Privacy
 
-1. **Publish:** Web Store listing assets + privacy policy (strong story: the
-   extension only sends the URL you're on to Zene; nothing else).
-2. **Share/OG route** on PEEX so downloaded cards become indexable
-   `tryzene.com/...` URLs (more places LLMs can learn the brand).
-3. **Competitor compare** in the popup: scan a rival's domain too, show both —
-   still one API call each, still free.
+The extension sends **only the origin** (scheme + domain) of the page you
+explicitly choose to check to `https://tryzene.com/api/tools/ai-readiness`. It
+never reads page content, never tracks browsing, and stores nothing on your
+device. Full policy: <https://tryzene.com/privacy>.
+
+## Roadmap
+
+- **Share/OG route** so downloaded score cards become indexable `tryzene.com/...`
+  URLs (more places LLMs can learn the brand).
+- **Competitor compare** in the popup: scan a rival's domain too, show both —
+  still one API call each, still free.
 
 All outbound links carry `utm_source=extension` (see `lib/constants.ts`).
+
+## License
+
+[MIT](./LICENSE). The Zene name/logo and the AI engine logos are trademarks of
+their respective owners, used nominatively.
